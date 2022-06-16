@@ -12,9 +12,8 @@ struct RectOnHover: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .background(Rectangle().stroke(Color.white, lineWidth: 4).opacity(isHovered ? 1.0 : 0.0))
-            .padding(2)
-            //.padding(isHovered ? 4 : 0)
+            .background(Rectangle().stroke(Color("Selector"), lineWidth: 4).opacity(isHovered ? 1.0 : 0.0))
+            .padding(3)
         .onHover { isHovered in
             withAnimation(.default.speed(1.3)) {
                 self.isHovered = isHovered
@@ -29,8 +28,7 @@ struct CircleOnHover: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .background(Circle().stroke(Color.white, lineWidth: 4).opacity(isHovered ? 1.0 : 0.0))
-            //.padding(isHovered ? 4 : 0)
+            .background(Circle().stroke(Color("Selector"), lineWidth: 4).opacity(isHovered ? 1.0 : 0.0))
         .onHover { isHovered in
             withAnimation(.default.speed(1.3)) {
                 self.isHovered = isHovered
