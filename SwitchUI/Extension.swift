@@ -16,7 +16,7 @@ struct RectOnHover: ViewModifier {
             .padding(2)
             //.padding(isHovered ? 4 : 0)
         .onHover { isHovered in
-            withAnimation {
+            withAnimation(.default.speed(1.3)) {
                 self.isHovered = isHovered
             }
         }
@@ -32,7 +32,7 @@ struct CircleOnHover: ViewModifier {
             .background(Circle().stroke(Color.white, lineWidth: 4).opacity(isHovered ? 1.0 : 0.0))
             //.padding(isHovered ? 4 : 0)
         .onHover { isHovered in
-            withAnimation {
+            withAnimation(.default.speed(1.3)) {
                 self.isHovered = isHovered
             }
         }
