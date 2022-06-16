@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import IOKit.ps
 
 struct ContentView: View {
+    
+    @State private var games: [String] = ["game_gta", "game_genshin", "game_csgo"]
+    
     var body: some View {
         VStack {
             TopBar()
-            AppsBar()
+            AppsBar(games: $games)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             MenuBar()
             BottomBar()
@@ -20,6 +24,25 @@ struct ContentView: View {
 }
 
 struct TopBar: View {
+    
+    @State private var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.dateStyle = .none
+        return formatter
+    }()
+    
+    @State private var batteryLevel: Int = {
+        guard let blob = IOPSCopyPowerSourcesInfo(),
+              let list = IOPSCopyPowerSourcesList(blob.takeRetainedValue()),
+              let array = list.takeRetainedValue() as? [Any],
+              array.count > 0,
+              let dict = array[0] as? NSDictionary else { return 0 }
+        let currentCapacity = dict[kIOPSCurrentCapacityKey] as? Double ?? 0
+        let maxCapacity = dict[kIOPSMaxCapacityKey] as? Double ?? 0
+        return Int(currentCapacity / maxCapacity * 100 / 25) * 25
+    }()
+    
     var body: some View {
         HStack {
             Spacer()
@@ -33,8 +56,8 @@ struct TopBar: View {
                 .overlay(Circle().stroke(Color.white, lineWidth: 2))
                 .hoverCircleAnimation()
             Spacer()
-            Text("21:52")
-            Image(systemName: "battery.100")
+            Text(dateFormatter.string(from: Date()))
+            Image(systemName: "battery.\(batteryLevel)")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 25, height: 15)
@@ -46,36 +69,25 @@ struct TopBar: View {
 }
 
 struct AppsBar: View {
+    
+    @Binding var games: [String]
+    
     var body: some View {
         ScrollView (.horizontal, showsIndicators: false) {
-             HStack {
-                 Image("game_gta")
-                     .hoverRectAnimation()
-                 Image("game_genshin")
-                     .hoverRectAnimation()
-                 Image("game_csgo")
-                     .hoverRectAnimation()
-                 Image("game_none")
-                     .renderingMode(.template)
-                     .foregroundColor(Color("MenuItem"))
-                 Image("game_none")
-                     .renderingMode(.template)
-                     .foregroundColor(Color("MenuItem"))
-                 Image("game_none")
-                     .renderingMode(.template)
-                     .foregroundColor(Color("MenuItem"))
-                 Image("game_none")
-                     .renderingMode(.template)
-                     .foregroundColor(Color("MenuItem"))
-                 Image("game_none")
-                     .renderingMode(.template)
-                     .foregroundColor(Color("MenuItem"))
-                 Image("game_none")
-                     .renderingMode(.template)
-                     .foregroundColor(Color("MenuItem"))
-                 Spacer()
-                     .frame(width: 40)
-             }
+            HStack {
+                ForEach(0..<10) { index in
+                    if index < games.count {
+                        Image(games[index])
+                            .hoverRectAnimation()
+                    } else {
+                        Image("game_none")
+                            .renderingMode(.template)
+                            .foregroundColor(Color("MenuItem"))
+                    }
+                }
+                Spacer()
+                    .frame(width: 40)
+            }
         }
         .frame(height: 160)
         .padding(.leading, 40)
@@ -83,62 +95,22 @@ struct AppsBar: View {
 }
 
 struct MenuBar: View {
+    
+    @State private var icons: [String] = ["message", "bag", "photo", "gamecontroller", "gear", "power"]
+    
     var body: some View {
         HStack {
-            Circle()
-                .fill(Color("MenuItem"))
-                .frame(width: 50, height: 50)
-                .overlay(Image(systemName: "message")
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundColor(Color("MenuIcon"))
-                    .padding(16))
-                .hoverCircleAnimation()
-            Circle()
-                .fill(Color("MenuItem"))
-                .frame(width: 50, height: 50)
-                .overlay(Image(systemName: "bag")
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundColor(Color("MenuIcon"))
-                    .padding(16))
-                .hoverCircleAnimation()
-            Circle()
-                .fill(Color("MenuItem"))
-                .frame(width: 50, height: 50)
-                .overlay(Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundColor(Color("MenuIcon"))
-                    .padding(16))
-                .hoverCircleAnimation()
-            Circle()
-                .fill(Color("MenuItem"))
-                .frame(width: 50, height: 50)
-                .overlay(Image(systemName: "gamecontroller")
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundColor(Color("MenuIcon"))
-                    .padding(16))
-                .hoverCircleAnimation()
-            Circle()
-                .fill(Color("MenuItem"))
-                .frame(width: 50, height: 50)
-                .overlay(Image(systemName: "gear")
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundColor(Color("MenuIcon"))
-                    .padding(16))
-                .hoverCircleAnimation()
-            Circle()
-                .fill(Color("MenuItem"))
-                .frame(width: 50, height: 50)
-                .overlay(Image(systemName: "power")
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundColor(Color("MenuIcon"))
-                    .padding(16))
-                .hoverCircleAnimation()
+            ForEach(icons, id: \.self) { icon in
+                Circle()
+                    .fill(Color("MenuItem"))
+                    .frame(width: 50, height: 50)
+                    .overlay(Image(systemName: icon)
+                        .resizable()
+                        .scaledToFill()
+                        .foregroundColor(Color("MenuIcon"))
+                        .padding(16))
+                    .hoverCircleAnimation()
+            }
         }
         .padding(.bottom, 16)
     }
