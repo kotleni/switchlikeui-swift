@@ -43,6 +43,8 @@ struct TopBar: View {
         return Int(currentCapacity / maxCapacity * 100 / 25) * 25
     }()
     
+    @State private var isBatteryDetailShow = false
+    
     var body: some View {
         HStack {
             Spacer()
@@ -57,10 +59,21 @@ struct TopBar: View {
                 .hoverCircleAnimation()
             Spacer()
             Text(dateFormatter.string(from: Date()))
+            
+            if isBatteryDetailShow {
+                Text("\(batteryLevel) %")
+                    .transition(.opacity)
+            }
+            
             Image(systemName: "battery.\(batteryLevel)")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 25, height: 15)
+                .onTapGesture {
+                    withAnimation {
+                        isBatteryDetailShow.toggle()
+                    }
+                }
             Spacer()
                 .frame(width: 16)
         }
